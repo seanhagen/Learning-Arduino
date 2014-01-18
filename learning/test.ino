@@ -39,21 +39,31 @@ void loop() {
 */
 
 const int ledOne = 13;
-int incomingByte = 0;
+
+char inData[20];
+char inChar=-1;
+byte index = 0;
 
 void setup() {
   Serial.begin(9600);
   pinMode( ledOne, OUTPUT );
+  Serial.write("Power on!");
 }
+
+char Comp( char* This );
 
 void loop() {
 
-  Serial.print("a");
-  delay(1000);
-  
-  if ( Serial.available() > 0 ){
+  if ( Comp("led on")==0 ){
+    digitalWrite( ledOne, HIGH );
+  }
 
-    /*
+  if ( Comp("led off")==0 ){
+    digitalWrite( ledOne, LOW );
+  }
+
+  /*
+  if ( Serial.available() > 0 ){
     incomingByte = Serial.read();
 
     if ( incomingByte >= 0 ){
@@ -65,10 +75,36 @@ void loop() {
     }
     
     Serial.print("Got byte: ");
-    Serial.println(incomingByte, DEC);
-    */
-    //delay(200);
+    Serial.println(incomingByte);
 
+    delay(200);
+  }
+  */
 
+}
+
+char Comp( char* This ) {
+  while( Serial.available() > 0 ){
+    inChar = Serial.read();
+
+    Serial.write( inChar );
+    
+    if ( index < 19 ){
+      inData[index++] = inChar;
+      inData[index] = '\0';
+    } else {
+      index = 0;
+      Serial.print("reset");
+    }
+  }
+
+  if ( strcmp( inData, This ) == 0 ) {
+    for ( int i=0; i<19; i++){
+      inData[i]=0;
+    }
+    index=0;
+    return(0);
+  } else {
+    return(1);
   }
 }
